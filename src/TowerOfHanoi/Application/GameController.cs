@@ -26,6 +26,9 @@ namespace TowerOfHanoi.Application
             _renderer.RenderWelcome();
             _renderer.RenderRules();
 
+            // Choose the board render style once, up front.
+            _renderer.Style = _input.ReadRenderStyle();
+
             bool keepPlaying = true;
             while (keepPlaying)
             {

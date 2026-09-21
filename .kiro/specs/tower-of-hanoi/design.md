@@ -17,6 +17,7 @@ Este documento descreve o design técnico do jogo **Tower of Hanoi** em **.NET F
 - **Entrada de movimentos (modo manual)**: por rótulos de pino — o jogador digita origem e destino como `A`, `B` ou `C` (ex.: `A C`). Consistente com os rótulos exibidos no tabuleiro.
 - **Discos**: inteiro de 4 a 8.
 - **Cor**: códigos ANSI, com detecção de suporte e fallback monocromático; respeita `NO_COLOR`.
+- **Estilo de renderização**: escolhido no início entre `Ascii` (discos com `=`, atual) e `Blocks` (discos com bloco Unicode `█`). É uma decisão puramente de apresentação; a geometria (largura `2*size+1`, centralização) é compartilhada entre os estilos. Para o estilo de blocos, a codificação de saída do console é definida como UTF-8.
 
 ## Architecture
 
@@ -53,7 +54,7 @@ O sistema é organizado em três camadas mais um ponto de entrada:
 ### Fluxo de alto nível
 
 1. `Program.Main` compõe as dependências (renderer, input reader, controller) e inicia o loop.
-2. `GameController` conduz: pergunta número de discos → pergunta modo → inicializa `Board` → executa loop de jogo (manual ou auto) → detecta vitória → oferece reiniciar/sair.
+2. `GameController` conduz: pergunta estilo de renderização (ASCII/blocos) → pergunta número de discos → pergunta modo → inicializa `Board` → executa loop de jogo (manual ou auto) → detecta vitória → oferece reiniciar/sair.
 3. No **modo manual**, o controller lê comandos de teclado, aplica movimentos no `Board`, e pede ao `Renderer` para redesenhar.
 4. No **modo auto**, o `HanoiSolver` gera a sequência ótima; o `AutoSolverRunner` aplica um movimento por vez com pausa, redesenhando entre passos, com possibilidade de interrupção.
 
@@ -72,6 +73,7 @@ src/
     Presentation/
       IRenderer.cs
       ConsoleRenderer.cs
+      RenderStyle.cs
       IInputReader.cs
       ConsoleInputReader.cs
       AnsiColor.cs
@@ -159,15 +161,23 @@ Constantes de escape ANSI e helpers.
 - `string Wrap(string text, string colorCode)` — aplica cor e reset (Requirement 9.6). Se cor desabilitada, retorna `text` inalterado.
 - Paleta fixa mapeando tamanho de disco → cor consistente durante a partida (Requirement 9.2).
 
-#### `IRenderer` / `ConsoleRenderer`
-Responsável por desenhar o tabuleiro (Requirements 2, 9).
+#### `RenderStyle` (enum)
+`Ascii`, `Blocks`. Define a aparência dos discos e do mastro (Requirement 12).
 
+#### `IRenderer` / `ConsoleRenderer`
+Responsável por desenhar o tabuleiro (Requirements 2, 9, 12).
+
+- `RenderStyle Style { get; set; }` — estilo de renderização, definido no início pelo controller após a escolha do jogador. Afeta apenas a aparência dos glifos; a geometria é compartilhada.
+- Glifos por estilo:
+  - `Ascii`: disco = `=`, mastro = `|`, base = `-` (comportamento atual, Requirement 12.2).
+  - `Blocks`: disco = bloco sólido Unicode `█`, mastro = `│`, base = `─` (Requirement 12.3).
 - `void RenderBoard(GameState state)`:
   - Calcula a largura máxima (`2 * DiscCount + 1`) para dimensionar a área de cada pino.
   - Desenha os pinos de cima para baixo: cada nível é uma linha com os três pinos lado a lado.
-  - Cada disco é um bloco (ex.: caracteres de bloco/`=`) de largura `2 * size + 1`, centralizado sobre o pino, colorido conforme `AnsiColor` quando habilitado.
-  - Pinos vazios mostram apenas o "mastro" (ex.: `|`) sobre a base.
+  - Cada disco é um bloco (glifo conforme o estilo) de largura `2 * size + 1`, centralizado sobre o pino, colorido conforme `AnsiColor` quando habilitado.
+  - Pinos vazios mostram apenas o "mastro" (glifo conforme o estilo) sobre a base.
   - Desenha rótulos `A B C`, a base do tabuleiro, e a linha de status: `Movimentos: X / mínimo: Y`.
+  - A largura do disco é medida em quantidade de caracteres (não bytes), de modo que a geometria seja idêntica entre ASCII e blocos.
 - `void RenderMessage(string message)` / `void RenderError(string message)` — mensagens e erros.
 - `void RenderWelcome()` / `void RenderRules()` — boas-vindas e regras (Requirements 1.1, 5.3).
 - `void RenderVictory(GameState state, bool optimal)` — vitória e reconhecimento de solução ótima (Requirement 4).
@@ -176,8 +186,9 @@ Responsável por desenhar o tabuleiro (Requirements 2, 9).
 #### `IInputReader` / `ConsoleInputReader`
 Leitura e parsing de entrada de teclado (Requirements 3, 5).
 
+- `RenderStyle ReadRenderStyle()` — lê escolha ASCII/blocos, repetindo em erro (Requirement 1.5, 1.6, 12.1, 12.6).
 - `int ReadDiscCount()` — lê e valida 4–8, repetindo em erro (Requirement 1.2, 1.3).
-- `GameMode ReadGameMode()` — lê escolha manual/auto (Requirement 1.5, 1.6).
+- `GameMode ReadGameMode()` — lê escolha manual/auto (Requirement 1.7, 1.8).
 - `PlayerCommand ReadCommand()` — interpreta a entrada do turno como:
   - Um **movimento** (`A C`, `AC`, case-insensitive) → `Move`.
   - Um **comando de controle**: `q`/`sair`, `r`/`reiniciar`, `h`/`ajuda` (Requirement 5).
@@ -199,11 +210,12 @@ Orquestra o ciclo de vida do jogo.
 
 - `void Run()` — loop principal:
   1. `RenderWelcome` + `RenderRules`.
-  2. `discCount = ReadDiscCount()`.
-  3. `mode = ReadGameMode()`.
-  4. `board = new Board(discCount)`.
-  5. Se `Manual` → `RunManualLoop(board)`; se `Auto` → `AutoSolverRunner.Run(board)`.
-  6. Ao vencer → `RenderVictory`; oferecer reiniciar/sair.
+  2. `style = ReadRenderStyle()` (uma vez, no início) → define `renderer.Style`.
+  3. `discCount = ReadDiscCount()`.
+  4. `mode = ReadGameMode()`.
+  5. `board = new Board(discCount)`.
+  6. Se `Manual` → `RunManualLoop(board)`; se `Auto` → `AutoSolverRunner.Run(board)`.
+  7. Ao vencer → `RenderVictory`; oferecer reiniciar/sair.
 - `RunManualLoop(Board board)`:
   - Redesenha o tabuleiro; lê comando; aplica `Move` via `board.TryMove` (mostrando erro em falha); trata `Quit`/`Restart`/`Help`; verifica `IsSolved` após cada movimento.
 

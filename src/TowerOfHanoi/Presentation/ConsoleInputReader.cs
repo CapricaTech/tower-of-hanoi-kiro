@@ -11,6 +11,35 @@ namespace TowerOfHanoi.Presentation
     /// </summary>
     public sealed class ConsoleInputReader : IInputReader
     {
+        public RenderStyle ReadRenderStyle()
+        {
+            while (true)
+            {
+                Console.Write("Estilo do tabuleiro - [a]scii ou [b]locos? (a/b): ");
+                string line = Console.ReadLine();
+
+                if (line == null)
+                {
+                    return RenderStyle.Ascii;
+                }
+
+                string choice = line.Trim().ToLowerInvariant();
+                switch (choice)
+                {
+                    case "a":
+                    case "ascii":
+                        return RenderStyle.Ascii;
+                    case "b":
+                    case "blocos":
+                    case "blocks":
+                        return RenderStyle.Blocks;
+                    default:
+                        Console.WriteLine("Escolha invalida. Digite 'a' para ASCII ou 'b' para blocos.");
+                        break;
+                }
+            }
+        }
+
         public int ReadDiscCount()
         {
             while (true)

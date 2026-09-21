@@ -25,8 +25,10 @@ O jogo é uma aplicação de **console interativa** que permite ao jogador mover
 2. QUANDO o jogo solicita o número de discos ENTÃO o sistema DEVE aceitar um valor inteiro entre 4 e 8 (inclusive).
 3. SE o jogador informar um valor fora do intervalo permitido ou não numérico ENTÃO o sistema DEVE exibir uma mensagem de erro e solicitar a entrada novamente.
 4. QUANDO o número de discos é definido ENTÃO o sistema DEVE posicionar todos os discos empilhados no primeiro pino (A), do maior (base) ao menor (topo).
-5. QUANDO o número de discos é definido ENTÃO o sistema DEVE perguntar ao jogador qual o modo de jogo: **manual** (o jogador faz os movimentos) ou **auto execução** (o computador resolve o quebra-cabeça automaticamente).
-6. SE a escolha do modo for inválida ENTÃO o sistema DEVE exibir uma mensagem de erro e solicitar a escolha novamente.
+5. QUANDO o jogo é iniciado ENTÃO o sistema DEVE perguntar ao jogador qual o estilo de renderização do tabuleiro: **ASCII** (blocos com o caractere `=`, o estilo atual) ou **blocos** (blocos sólidos com caracteres de bloco Unicode).
+6. SE a escolha do estilo de renderização for inválida ENTÃO o sistema DEVE exibir uma mensagem de erro e solicitar a escolha novamente.
+7. QUANDO o número de discos é definido ENTÃO o sistema DEVE perguntar ao jogador qual o modo de jogo: **manual** (o jogador faz os movimentos) ou **auto execução** (o computador resolve o quebra-cabeça automaticamente).
+8. SE a escolha do modo for inválida ENTÃO o sistema DEVE exibir uma mensagem de erro e solicitar a escolha novamente.
 
 ### Requirement 2 — Visualizar o estado do tabuleiro
 
@@ -134,3 +136,17 @@ O jogo é uma aplicação de **console interativa** que permite ao jogador mover
 4. QUANDO a auto execução termina ENTÃO o sistema DEVE ter usado exatamente o número mínimo de movimentos (2^n - 1) e declarar a vitória exibindo o total de movimentos.
 5. QUANDO a auto execução está rodando ENTÃO o sistema DEVE permitir que o jogador a interrompa (por exemplo, pressionando uma tecla ou `Ctrl+C`) de forma limpa, retornando ao menu ou encerrando conforme o comando.
 6. A geração da sequência de movimentos da solução DEVE ser implementada na camada de domínio, de forma determinística e testável, sem depender de saída de console.
+
+### Requirement 12 — Estilos de renderização (ASCII e blocos)
+
+**User Story:** Como jogador, quero escolher entre o estilo ASCII atual e um estilo de blocos sólidos, para que eu possa jogar com a aparência que preferir.
+
+#### Acceptance Criteria
+
+1. QUANDO o jogo é iniciado ENTÃO o sistema DEVE oferecer dois estilos de renderização do tabuleiro: **ASCII** (o estilo atual, usando o caractere `=` para os discos) e **blocos** (usando caracteres de bloco Unicode, por exemplo `█`, para desenhar discos sólidos).
+2. QUANDO o jogador escolhe o estilo ASCII ENTÃO o sistema DEVE renderizar exatamente como o comportamento atual (discos com `=`, mastro com `|`, base com `-`).
+3. QUANDO o jogador escolhe o estilo de blocos ENTÃO o sistema DEVE renderizar os discos como blocos sólidos usando caracteres de bloco Unicode, mantendo a mesma geometria (largura proporcional `2*tamanho+1`, centralização e alinhamento das colunas).
+4. QUANDO qualquer estilo é usado ENTÃO o sistema DEVE preservar todos os demais elementos do tabuleiro: rótulos A/B/C, base, linha de status (movimentos/mínimo) e a coloração ANSI por tamanho de disco quando a cor estiver habilitada.
+5. QUANDO o estilo de blocos é usado ENTÃO o sistema DEVE garantir que a saída Unicode seja emitida corretamente (por exemplo, configurando a codificação de saída do console para UTF-8), sem depender de APIs específicas do Windows.
+6. SE a escolha do estilo for inválida ENTÃO o sistema DEVE exibir uma mensagem de erro e solicitar a escolha novamente.
+7. A seleção do estilo de renderização DEVE afetar apenas a camada de apresentação, sem alterar a lógica de domínio (regras, estado, solução).

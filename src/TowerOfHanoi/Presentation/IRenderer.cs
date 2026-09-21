@@ -8,6 +8,9 @@ namespace TowerOfHanoi.Presentation
     /// </summary>
     public interface IRenderer
     {
+        /// <summary>The visual style used to draw the board.</summary>
+        RenderStyle Style { get; set; }
+
         void RenderWelcome();
         void RenderRules();
         void RenderBoard(GameState state);

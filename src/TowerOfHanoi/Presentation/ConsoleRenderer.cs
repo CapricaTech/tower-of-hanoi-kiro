@@ -12,15 +12,41 @@ namespace TowerOfHanoi.Presentation
     /// </summary>
     public sealed class ConsoleRenderer : IRenderer
     {
-        private const char DiscChar = '=';
-        private const char MastChar = '|';
+        // ASCII style glyphs (the classic look).
+        private const char AsciiDiscChar = '=';
+        private const char AsciiMastChar = '|';
+        private const char AsciiBaseChar = '-';
+
+        // Block style glyphs (solid Unicode blocks).
+        private const char BlockDiscChar = '\u2588'; // full block
+        private const char BlockMastChar = '\u2502'; // box drawings light vertical
+        private const char BlockBaseChar = '\u2500'; // box drawings light horizontal
+
         private const int PegGap = 3; // spaces between pegs
 
         private readonly AnsiColor _color;
 
+        public RenderStyle Style { get; set; }
+
         public ConsoleRenderer(AnsiColor color)
         {
             _color = color;
+            Style = RenderStyle.Ascii;
+        }
+
+        private char DiscChar
+        {
+            get { return Style == RenderStyle.Blocks ? BlockDiscChar : AsciiDiscChar; }
+        }
+
+        private char MastChar
+        {
+            get { return Style == RenderStyle.Blocks ? BlockMastChar : AsciiMastChar; }
+        }
+
+        private char BaseChar
+        {
+            get { return Style == RenderStyle.Blocks ? BlockBaseChar : AsciiBaseChar; }
         }
 
         public void RenderWelcome()
@@ -68,7 +94,7 @@ namespace TowerOfHanoi.Presentation
             }
 
             // Base line under all three pegs.
-            string baseSegment = new string('-', colWidth);
+            string baseSegment = new string(BaseChar, colWidth);
             sb.Append(baseSegment).Append(gap).Append(baseSegment).Append(gap).Append(baseSegment);
             sb.AppendLine();
 

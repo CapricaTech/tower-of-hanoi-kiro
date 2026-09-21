@@ -8,6 +8,7 @@ namespace TowerOfHanoi.Presentation
     /// </summary>
     public interface IInputReader
     {
+        RenderStyle ReadRenderStyle();
         int ReadDiscCount();
         GameMode ReadGameMode();
         PlayerCommand ReadCommand();

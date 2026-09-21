@@ -55,6 +55,7 @@
     <Compile Include="Presentation\AnsiColor.cs" />
     <Compile Include="Presentation\IRenderer.cs" />
     <Compile Include="Presentation\ConsoleRenderer.cs" />
+    <Compile Include="Presentation\RenderStyle.cs" />
     <Compile Include="Presentation\IInputReader.cs" />
     <Compile Include="Presentation\PlayerCommand.cs" />
     <Compile Include="Presentation\ConsoleInputReader.cs" />

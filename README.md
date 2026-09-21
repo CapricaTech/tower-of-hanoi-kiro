@@ -10,7 +10,8 @@ com a logica de dominio separada da camada de apresentacao.
 
 ## Recursos
 
-- Tabuleiro em ASCII com discos desenhados como blocos de largura proporcional.
+- Dois estilos de tabuleiro, escolhidos no inicio: **ASCII** (discos com `=`) ou
+  **blocos** (discos solidos com caracteres de bloco Unicode `█`).
 - Cores via sequencias de escape ANSI, com deteccao automatica e _fallback_
   monocromatico quando o terminal nao suporta cor ou a saida e redirecionada.
 - Modo **manual** (voce move os discos) e modo de **auto execucao** (o computador
@@ -25,7 +26,9 @@ com a logica de dominio separada da camada de apresentacao.
 
 ## Como jogar
 
-Ao iniciar, o jogo pede o numero de discos (4 a 8) e o modo (manual ou auto).
+Ao iniciar, o jogo pergunta, nesta ordem: o **estilo do tabuleiro**
+(`a` = ASCII ou `b` = blocos), o **numero de discos** (4 a 8) e o **modo**
+(manual ou auto).
 
 No modo manual, informe o movimento como origem e destino usando os rotulos dos
 pinos. Exemplos equivalentes: `A C`, `a c`, `ac`.

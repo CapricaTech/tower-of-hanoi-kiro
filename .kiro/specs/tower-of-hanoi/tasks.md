@@ -104,3 +104,24 @@
   - Validar fallback sem cor (`NO_COLOR=1` e saída redirecionada) sem exibir caracteres de controle crus.
   - Validar a execução em container em modo interativo.
   - _Requirements: 4.1, 5.1, 7.3, 8.3, 9.4, 10.4_
+
+## Adicional — Estilos de renderização (ASCII e blocos)
+
+- [ ] 13. Adicionar escolha entre estilo ASCII e blocos
+- [ ] 13.1 Definir `RenderStyle` e tornar o `ConsoleRenderer` parametrizável por estilo
+  - Criar o enum `RenderStyle` (`Ascii`, `Blocks`) na camada de apresentação.
+  - Adicionar `RenderStyle Style { get; set; }` ao `IRenderer`/`ConsoleRenderer` e derivar os glifos (disco/mastro/base) a partir do estilo, mantendo a geometria compartilhada (largura `2*size+1`, centralização, alinhamento das colunas).
+  - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.7_
+
+- [ ] 13.2 Ler a escolha de estilo na entrada e aplicá-la no fluxo
+  - Adicionar `RenderStyle ReadRenderStyle()` ao `IInputReader`/`ConsoleInputReader`, validando a escolha e repetindo em erro.
+  - No `GameController.Run()`, ler o estilo no início e definir `renderer.Style` antes de iniciar as partidas.
+  - _Requirements: 1.5, 1.6, 12.1, 12.6_
+
+- [ ] 13.3 Garantir saída Unicode para o estilo de blocos
+  - No `Program.Main`, configurar `Console.OutputEncoding` para UTF-8 de modo que os caracteres de bloco sejam exibidos corretamente, sem APIs específicas do Windows.
+  - _Requirements: 12.5_
+
+- [ ] 13.4 Verificar os dois estilos
+  - Validar que o estilo ASCII permanece idêntico ao comportamento atual e que o estilo de blocos renderiza discos sólidos com a mesma geometria, preservando rótulos, base, status e cor.
+  - _Requirements: 12.2, 12.3, 12.4_

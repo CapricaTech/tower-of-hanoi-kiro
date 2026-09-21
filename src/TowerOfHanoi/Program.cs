@@ -8,6 +8,18 @@ namespace TowerOfHanoi
     {
         private static void Main(string[] args)
         {
+            // Ensure Unicode block characters render correctly (used by the
+            // "blocks" render style). Guarded because some redirected/console
+            // hosts do not allow changing the encoding.
+            try
+            {
+                Console.OutputEncoding = System.Text.Encoding.UTF8;
+            }
+            catch
+            {
+                // Non-fatal: ASCII style still works; blocks may degrade.
+            }
+
             // Resolve color support: environment detection, overridable by a
             // --no-color flag for convenience.
             bool forceNoColor = HasFlag(args, "--no-color");
