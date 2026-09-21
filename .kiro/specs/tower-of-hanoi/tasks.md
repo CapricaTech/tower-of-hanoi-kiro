@@ -110,8 +110,9 @@
 - [ ] 13. Adicionar escolha entre estilo ASCII e blocos
 - [ ] 13.1 Definir `RenderStyle` e tornar o `ConsoleRenderer` parametrizável por estilo
   - Criar o enum `RenderStyle` (`Ascii`, `Blocks`) na camada de apresentação.
-  - Adicionar `RenderStyle Style { get; set; }` ao `IRenderer`/`ConsoleRenderer` e derivar os glifos (disco/mastro/base) a partir do estilo, mantendo a geometria compartilhada (largura `2*size+1`, centralização, alinhamento das colunas).
-  - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.7_
+  - Adicionar `RenderStyle Style { get; set; }` ao `IRenderer`/`ConsoleRenderer` e derivar os glifos (disco/mastro/base) a partir do estilo.
+  - Aplicar uma escala por estilo (ASCII 1x; blocos 2x em largura e altura): largura do disco `(2*size+1) * Scale` e repetição vertical de cada nível `Scale` vezes, preservando proporcionalidade, centralização e alinhamento das colunas.
+  - _Requirements: 12.1, 12.2, 12.3, 12.3a, 12.4, 12.7_
 
 - [ ] 13.2 Ler a escolha de estilo na entrada e aplicá-la no fluxo
   - Adicionar `RenderStyle ReadRenderStyle()` ao `IInputReader`/`ConsoleInputReader`, validando a escolha e repetindo em erro.
@@ -123,5 +124,5 @@
   - _Requirements: 12.5_
 
 - [ ] 13.4 Verificar os dois estilos
-  - Validar que o estilo ASCII permanece idêntico ao comportamento atual e que o estilo de blocos renderiza discos sólidos com a mesma geometria, preservando rótulos, base, status e cor.
-  - _Requirements: 12.2, 12.3, 12.4_
+  - Validar que o estilo ASCII permanece idêntico ao comportamento atual e que o estilo de blocos renderiza discos sólidos no dobro do tamanho (2x em largura e altura), preservando proporcionalidade, centralização, alinhamento das colunas, rótulos, base, status e cor.
+  - _Requirements: 12.2, 12.3, 12.3a, 12.4_

@@ -139,13 +139,14 @@ O jogo é uma aplicação de **console interativa** que permite ao jogador mover
 
 ### Requirement 12 — Estilos de renderização (ASCII e blocos)
 
-**User Story:** Como jogador, quero escolher entre o estilo ASCII atual e um estilo de blocos sólidos, para que eu possa jogar com a aparência que preferir.
+**User Story:** Como jogador, quero escolher entre o estilo ASCII atual e um estilo de blocos sólidos (desenhado maior, no dobro do tamanho), para que eu possa jogar com a aparência que preferir.
 
 #### Acceptance Criteria
 
 1. QUANDO o jogo é iniciado ENTÃO o sistema DEVE oferecer dois estilos de renderização do tabuleiro: **ASCII** (o estilo atual, usando o caractere `=` para os discos) e **blocos** (usando caracteres de bloco Unicode, por exemplo `█`, para desenhar discos sólidos).
 2. QUANDO o jogador escolhe o estilo ASCII ENTÃO o sistema DEVE renderizar exatamente como o comportamento atual (discos com `=`, mastro com `|`, base com `-`).
-3. QUANDO o jogador escolhe o estilo de blocos ENTÃO o sistema DEVE renderizar os discos como blocos sólidos usando caracteres de bloco Unicode, mantendo a mesma geometria (largura proporcional `2*tamanho+1`, centralização e alinhamento das colunas).
+3. QUANDO o jogador escolhe o estilo de blocos ENTÃO o sistema DEVE renderizar os discos como blocos sólidos usando caracteres de bloco Unicode, desenhados no dobro do tamanho do estilo ASCII em ambas as dimensões (largura e altura): a largura de cada disco é `(2*tamanho+1) * 2` caracteres e cada disco ocupa 2 linhas de altura.
+3a. QUANDO o estilo de blocos é usado ENTÃO o sistema DEVE preservar a proporcionalidade entre os discos (discos maiores continuam mais largos que os menores), a centralização de cada disco sobre o pino e o alinhamento das três colunas.
 4. QUANDO qualquer estilo é usado ENTÃO o sistema DEVE preservar todos os demais elementos do tabuleiro: rótulos A/B/C, base, linha de status (movimentos/mínimo) e a coloração ANSI por tamanho de disco quando a cor estiver habilitada.
 5. QUANDO o estilo de blocos é usado ENTÃO o sistema DEVE garantir que a saída Unicode seja emitida corretamente (por exemplo, configurando a codificação de saída do console para UTF-8), sem depender de APIs específicas do Windows.
 6. SE a escolha do estilo for inválida ENTÃO o sistema DEVE exibir uma mensagem de erro e solicitar a escolha novamente.

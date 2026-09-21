@@ -17,7 +17,7 @@ Este documento descreve o design técnico do jogo **Tower of Hanoi** em **.NET F
 - **Entrada de movimentos (modo manual)**: por rótulos de pino — o jogador digita origem e destino como `A`, `B` ou `C` (ex.: `A C`). Consistente com os rótulos exibidos no tabuleiro.
 - **Discos**: inteiro de 4 a 8.
 - **Cor**: códigos ANSI, com detecção de suporte e fallback monocromático; respeita `NO_COLOR`.
-- **Estilo de renderização**: escolhido no início entre `Ascii` (discos com `=`, atual) e `Blocks` (discos com bloco Unicode `█`). É uma decisão puramente de apresentação; a geometria (largura `2*size+1`, centralização) é compartilhada entre os estilos. Para o estilo de blocos, a codificação de saída do console é definida como UTF-8.
+- **Estilo de renderização**: escolhido no início entre `Ascii` (discos com `=`, atual, escala 1x) e `Blocks` (discos com bloco Unicode `█`, escala 2x — dobro em largura e altura). É uma decisão puramente de apresentação; a proporcionalidade entre discos, a centralização e o alinhamento das colunas são preservados nos dois estilos. Para o estilo de blocos, a codificação de saída do console é definida como UTF-8.
 
 ## Architecture
 
@@ -167,17 +167,18 @@ Constantes de escape ANSI e helpers.
 #### `IRenderer` / `ConsoleRenderer`
 Responsável por desenhar o tabuleiro (Requirements 2, 9, 12).
 
-- `RenderStyle Style { get; set; }` — estilo de renderização, definido no início pelo controller após a escolha do jogador. Afeta apenas a aparência dos glifos; a geometria é compartilhada.
+- `RenderStyle Style { get; set; }` — estilo de renderização, definido no início pelo controller após a escolha do jogador. Afeta a aparência dos glifos e a escala do desenho.
 - Glifos por estilo:
   - `Ascii`: disco = `=`, mastro = `|`, base = `-` (comportamento atual, Requirement 12.2).
   - `Blocks`: disco = bloco sólido Unicode `█`, mastro = `│`, base = `─` (Requirement 12.3).
+- Escala por estilo (`Scale`): `Ascii` = 1x; `Blocks` = 2x (dobro em largura **e** altura). A escala afeta apenas a apresentação — a proporcionalidade entre discos, a centralização e o alinhamento das colunas são preservados em ambos os estilos.
 - `void RenderBoard(GameState state)`:
-  - Calcula a largura máxima (`2 * DiscCount + 1`) para dimensionar a área de cada pino.
-  - Desenha os pinos de cima para baixo: cada nível é uma linha com os três pinos lado a lado.
-  - Cada disco é um bloco (glifo conforme o estilo) de largura `2 * size + 1`, centralizado sobre o pino, colorido conforme `AnsiColor` quando habilitado.
+  - Calcula a largura da coluna de cada pino como `(2 * DiscCount + 1) * Scale`.
+  - Desenha os pinos de cima para baixo; cada nível de disco é repetido `Scale` vezes na vertical (1 linha no ASCII, 2 linhas nos blocos).
+  - Cada disco é um bloco (glifo conforme o estilo) de largura `(2 * size + 1) * Scale`, centralizado sobre o pino, colorido conforme `AnsiColor` quando habilitado.
   - Pinos vazios mostram apenas o "mastro" (glifo conforme o estilo) sobre a base.
   - Desenha rótulos `A B C`, a base do tabuleiro, e a linha de status: `Movimentos: X / mínimo: Y`.
-  - A largura do disco é medida em quantidade de caracteres (não bytes), de modo que a geometria seja idêntica entre ASCII e blocos.
+  - A largura do disco é medida em quantidade de caracteres (não bytes), mantendo o alinhamento independentemente do estilo.
 - `void RenderMessage(string message)` / `void RenderError(string message)` — mensagens e erros.
 - `void RenderWelcome()` / `void RenderRules()` — boas-vindas e regras (Requirements 1.1, 5.3).
 - `void RenderVictory(GameState state, bool optimal)` — vitória e reconhecimento de solução ótima (Requirement 4).

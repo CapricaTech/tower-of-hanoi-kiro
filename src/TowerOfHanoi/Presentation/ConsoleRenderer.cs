@@ -49,6 +49,15 @@ namespace TowerOfHanoi.Presentation
             get { return Style == RenderStyle.Blocks ? BlockBaseChar : AsciiBaseChar; }
         }
 
+        /// <summary>
+        /// How much to scale a disc in both width and height. The blocks style is
+        /// drawn at 2x (twice as wide and twice as tall); ASCII stays at 1x.
+        /// </summary>
+        private int Scale
+        {
+            get { return Style == RenderStyle.Blocks ? 2 : 1; }
+        }
+
         public void RenderWelcome()
         {
             Console.WriteLine();
@@ -75,22 +84,28 @@ namespace TowerOfHanoi.Presentation
         public void RenderBoard(GameState state)
         {
             int n = state.DiscCount;
-            int colWidth = 2 * n + 1;      // width to hold the largest disc
-            int height = n;                 // one line per possible disc level
+            int scale = Scale;
+            // Width to hold the largest disc, scaled horizontally.
+            int colWidth = (2 * n + 1) * scale;
+            int height = n;                 // one disc level per possible position
             string gap = new string(' ', PegGap);
 
             var sb = new StringBuilder();
             sb.AppendLine();
 
-            // Draw from the top level down to the bottom level.
+            // Draw from the top level down to the bottom level. Each level is
+            // repeated 'scale' times to scale the discs vertically.
             for (int level = height - 1; level >= 0; level--)
             {
-                sb.Append(RenderLevel(state.PegA, level, colWidth));
-                sb.Append(gap);
-                sb.Append(RenderLevel(state.PegB, level, colWidth));
-                sb.Append(gap);
-                sb.Append(RenderLevel(state.PegC, level, colWidth));
-                sb.AppendLine();
+                for (int row = 0; row < scale; row++)
+                {
+                    sb.Append(RenderLevel(state.PegA, level, colWidth));
+                    sb.Append(gap);
+                    sb.Append(RenderLevel(state.PegB, level, colWidth));
+                    sb.Append(gap);
+                    sb.Append(RenderLevel(state.PegC, level, colWidth));
+                    sb.AppendLine();
+                }
             }
 
             // Base line under all three pegs.
@@ -123,7 +138,7 @@ namespace TowerOfHanoi.Presentation
             if (level < discsBottomToTop.Count)
             {
                 int size = discsBottomToTop[level];
-                int blockWidth = 2 * size + 1;
+                int blockWidth = (2 * size + 1) * Scale;
                 int pad = (colWidth - blockWidth) / 2;
                 string block = new string(DiscChar, blockWidth);
                 string colored = _color.ColorDisc(block, size);

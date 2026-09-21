@@ -11,7 +11,8 @@ com a logica de dominio separada da camada de apresentacao.
 ## Recursos
 
 - Dois estilos de tabuleiro, escolhidos no inicio: **ASCII** (discos com `=`) ou
-  **blocos** (discos solidos com caracteres de bloco Unicode `█`).
+  **blocos** (discos solidos com caracteres de bloco Unicode `█`, desenhados no
+  dobro do tamanho — 2x em largura e altura).
 - Cores via sequencias de escape ANSI, com deteccao automatica e _fallback_
   monocromatico quando o terminal nao suporta cor ou a saida e redirecionada.
 - Modo **manual** (voce move os discos) e modo de **auto execucao** (o computador
@@ -23,6 +24,27 @@ com a logica de dominio separada da camada de apresentacao.
 - [Mono](https://www.mono-project.com/) instalado (fornece `mcs` e `mono`).
   No macOS: `brew install mono`.
 - Opcional, para o modo container: Docker (ou Podman).
+
+## Inicio rapido
+
+Escolha um dos dois caminhos abaixo.
+
+**Com Mono local** (precisa de `mono`/`mcs` instalados):
+
+```bash
+./build.sh
+mono src/TowerOfHanoi/bin/Release/TowerOfHanoi.exe
+```
+
+**Com container** (precisa de Docker; nao precisa de Mono na maquina):
+
+```bash
+docker build -t tower-of-hanoi .
+docker run -it --rm tower-of-hanoi
+```
+
+Detalhes de cada caminho estao nas secoes [Execucao local com Mono](#execucao-local-com-mono)
+e [Execucao como container](#execucao-como-container) abaixo.
 
 ## Como jogar
 
