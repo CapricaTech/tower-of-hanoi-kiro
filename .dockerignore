@@ -1,0 +1,8 @@
+# Build artifacts and local tooling not needed in the image build context.
+**/bin/
+**/obj/
+.git/
+.kiro/
+*.md
+LICENSE
+build.sh
